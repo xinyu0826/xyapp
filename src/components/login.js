@@ -1,12 +1,38 @@
 import React, { Component } from 'react'
-import { Flex, NavBar, WingBlank, List, InputItem, Button } from 'antd-mobile'
-import 'antd-mobile/dist/antd-mobile.css'
+import { Flex, NavBar, WingBlank, List, InputItem, Button, Toast } from 'antd-mobile'
 import './login.css'
+import axios from '../http'
 
 class Login extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      uname: '',
+      pwd: ''
+    }
+  }
+
+  headLogin = async () => {
+    // console.log(123)
+    const { data: { meta: { status, msg } } } = await axios.post(`/users/login`, {
+      uname: this.state.uname,
+      pwd: this.state.pwd
+    })
+    if (status === 200) {
+      // console.log(this.props)
+      const { history } = this.props
+      history.push('/')
+    } else {
+      // 提示
+      Toast.fail(msg, 1)
+    }
+  }
+
+  changeInputValue = (key, val) => {
+    // console.log(key, val)
+    this.setState({
+      [key]: val
+    })
   }
   render() {
     return (
@@ -21,12 +47,20 @@ class Login extends Component {
               <InputItem
                 clear
                 placeholder="请输入用户名"
+                value = {this.state.uname}
+                onChange = { val => {
+                  this.changeInputValue('uname', val)
+                }}
               >账号</InputItem>
               <InputItem
                 clear
                 placeholder="请输入密码"
+                value = {this.state.pwd}
+                onChange = { val => {
+                  this.changeInputValue('pwd', val)
+                }}
               >密码</InputItem>
-              <Button type="primary">登录</Button>
+              <Button type="primary" onClick = {this.headLogin}>登录</Button>
             </List>
 
           </Flex.Item>
